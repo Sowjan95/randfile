@@ -12,9 +12,17 @@ int createRand(){
     printf("fd: %d\n", fd);
   }
   int buff[1];
-  read(fd, buff, sizeof (buff));
+  int rd = read(fd, buff, sizeof (buff));
+  if (rd < 0){
+    printf("errno: %d error %s\n", errno, strerror(errno));
+    printf("rd: %d\n", rd);
+  }
   close(fd);
   return buff[0];
+
+  //check warnings after reading and writing as well
+  //or int rand; read(fd, &rand, sizeof)
+  //int has 4 bytes. you want to read 4 bytes
 }
 
 
@@ -25,23 +33,31 @@ int main(){
     randData[x] = createRand();
     printf("random %d: %d\n", x, randData[x]);
   }
-  
-  int rd = open("randFile", O_CREAT, 0644);
+
+  int fd = open("randFile", O_CREAT, 0644);
+  if (fd < 0){
+    printf("errno: %d error %s\n", errno, strerror(errno));
+    printf("fd: %d\n", fd);
+  }
+  close(fd);
+
+  printf("\nWriting numbers to file...\n");
+  int wd = open("randFile", O_WRONLY);
+  if (wd < 0){
+    printf("errno: %d error %s\n", errno, strerror(errno));
+    printf("wd: %d\n", wd);
+  }
+  write(wd, randData, sizeof (randData));
+  close(wd);
+
+  printf("\nReading numbers to file...\n");
+  int myData[10];
+  int rd = open("randFile", O_RDONLY);
   if (rd < 0){
     printf("errno: %d error %s\n", errno, strerror(errno));
     printf("rd: %d\n", rd);
   }
-  close(rd);
-
-  printf("\nWriting numbers to file...\n");
-  rd = open("randFile", O_WRONLY);
-  write(rd, randData, sizeof (randData));
-  close(rd);
-
-  printf("\nReading numbers to file...\n");
-  int myData[10];
-  rd = open("randFile", O_RDONLY);
-  int x = read(rd, myData, sizeof (myData));
+  read(rd, myData, sizeof (myData));
   close(rd);
 
   printf("\nVerification that written numbers were the same:\n");
