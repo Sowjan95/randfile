@@ -34,12 +34,14 @@ int main(){
   close(rd);
 
   printf("\nWriting numbers to file...\n");
-  rd = open("randFile", O_RDWR);
+  rd = open("randFile", O_WRONLY);
   write(rd, randData, sizeof (randData));
+  close(rd);
 
   printf("\nReading numbers to file...\n");
   int myData[10];
-  read(rd, myData, sizeof (myData));
+  rd = open("randFile", O_RDONLY);
+  int x = read(rd, myData, sizeof (myData));
   close(rd);
 
   printf("\nVerification that written numbers were the same:\n");
